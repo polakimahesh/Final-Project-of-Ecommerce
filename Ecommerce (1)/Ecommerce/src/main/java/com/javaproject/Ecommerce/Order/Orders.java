@@ -27,4 +27,7 @@ public class Orders {
      @ManyToOne
      private Customer customer;
 
+     private  double grandTotal;
+
+
 }

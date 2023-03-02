@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Orders,Integer> {
+//    Orders findByCustomer_Id(int id);
 
 }

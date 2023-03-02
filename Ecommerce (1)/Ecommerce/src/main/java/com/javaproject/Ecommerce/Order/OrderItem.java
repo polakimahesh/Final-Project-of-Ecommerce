@@ -2,6 +2,8 @@ package com.javaproject.Ecommerce.Order;
 
 import com.javaproject.Ecommerce.Products.Product;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +21,7 @@ public class OrderItem {
     @GeneratedValue()
     private int id;
     @ManyToOne
+    @Cascade({CascadeType.ALL})
     private Orders orders;
     private String itemName;
     private  int itemQuantity;

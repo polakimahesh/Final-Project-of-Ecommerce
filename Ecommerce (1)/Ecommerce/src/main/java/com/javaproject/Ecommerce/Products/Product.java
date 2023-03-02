@@ -24,10 +24,9 @@ public class Product {
     @NotNull(message = "Description is mandatory")
     private String description;
 
-    private  double totalPrice;
 
-    public Product(int id){
-        this.id=id;
-    }
+//    public Product(int id){
+//        this.id=id;
+//    }
 
 }

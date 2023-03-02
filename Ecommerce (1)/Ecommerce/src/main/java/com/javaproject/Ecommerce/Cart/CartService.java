@@ -5,6 +5,7 @@ import com.javaproject.Ecommerce.Customer.CustomerRepository;
 import com.javaproject.Ecommerce.DTO.*;
 import com.javaproject.Ecommerce.Products.Product;
 import com.javaproject.Ecommerce.Products.ProductRepository;
+import com.javaproject.Ecommerce.Products.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ public class CartService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ProductService productService;
+
 
     public List<Cart> getAllCarts() {
        return cartRepository.findAll();
@@ -34,6 +38,7 @@ public class CartService {
         HashMap<String,Object> response1= new HashMap<>();
         Cart cart ;
         cart=cartRepository.findById(cartDto.getCustomerId()).orElse(null);
+
         if(cart==null){
             Customer customer =customerRepository.findById(cartDto.getCustomerId()).orElse(null);
             if(customer==null){
@@ -57,21 +62,51 @@ public class CartService {
         return  response;
     }
 
-    public CartItem createCartItems(CartItemDto cartItemDto){
+    public HashMap<String,Object> createCartItems(CartItemDto cartItemDto){
+        HashMap<String,Object> response = new HashMap<>();
+        HashMap<String,Object> response1= new HashMap<>();
         Cart cart = cartRepository.findById((cartItemDto.getCartId())).orElse(null);
         Product product =productRepository.findById(cartItemDto.getProductId()).orElse(null);
+        if(cart==null){
+            response1.put("message","incorrect customer cart id "+cartItemDto.getCartId());
+            response.put("isSuccess",false);
+            response.put("message",response1);
+            return  response;
+        }else if(product==null) {
+            response1.put("message", "incorrect product id " + cartItemDto.getProductId());
+            response.put("isSuccess", false);
+            response.put("message", response1);
+            return response;
+        }else {
+            GetAvailabilityDto getAvailabilityDto = new GetAvailabilityDto();
+            getAvailabilityDto.setProductId(cartItemDto.getProductId());
+            getAvailabilityDto.setQuantity(cartItemDto.getItemQuantity());
+            var isProductAvailable = productService.productsAvailabilityCheck(getAvailabilityDto);
+            if (!isProductAvailable) {
+                response1.put("message", product.getName() + " is not available, please wait for some time");
+                response.put("isSuccess", false);
+                response.put("message", response1);
+                return response;
+            }
+        }
         CartItem  cartItem = new CartItem();
         cartItem.setCart(cart);
         cartItem.setProduct(product);
         cartItem.setItemName(product.getName());
-        cartItem.setItemQuantity(product.getQuantity());
+        cartItem.setItemQuantity(cartItemDto.getItemQuantity());
         cartItem.setItemPrice(product.getPrice());
         cartItem.setDescription(product.getDescription());
         cartItem.setTotalPrice((cartItem.getItemQuantity()*cartItem.getItemPrice()));
         cartItemRepository.save(cartItem);
-       return  cartItem;
-
+        response1.put("message",product.getName()+" added to cart successfully!");
+        response.put("isSuccess",true);
+        response.put("message",response1);
+        return  response;
     }
+
+
+
+
 
     public HashMap<String,Object> getAllCartItemsWithID(GetCartDto getCartDto){
         HashMap<String,Object> response = new HashMap<>();
@@ -88,7 +123,7 @@ public class CartService {
             double grandTotal=0.0;
             for(CartItem cartItem1:cartItem){
                 CartItemResponseDto cartItemResponseDto =new CartItemResponseDto();
-                cartItemResponseDto.setItemId(cartItem1.getId());
+//                cartItemResponseDto.setItemId(cartItem1.getId());
                 cartItemResponseDto.setItemName(cartItem1.getItemName());
                 cartItemResponseDto.setItemQuantity(cartItem1.getItemQuantity());
                 cartItemResponseDto.setItemPrice(cartItem1.getItemPrice());
@@ -118,13 +153,14 @@ public class CartService {
             response.put("message",response1);
             return response;
         }else{
-            response1.put("message","Item added successfully in id "+cartUpdateItemDto.getCartId());
+            response1.put("message","Updated Cart Items successfully in id "+cartUpdateItemDto.getCartId());
              cartItem.setItemQuantity(cartUpdateItemDto.getQuantity());
              cartItem.setTotalPrice(cartUpdateItemDto.getQuantity()*cartItem.getProduct().getPrice());
              cartItemRepository.save(cartItem);
             response.put("isSuccess",true);
-            response.put("message",cartItem);
+            response.put("message",response1);
             return response;
         }
     }
+
 }

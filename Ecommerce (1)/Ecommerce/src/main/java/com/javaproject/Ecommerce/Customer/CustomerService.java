@@ -19,17 +19,33 @@ public class CustomerService {
         return customerRepository.findAll();
     }
 
-   public Customer createCustomer(CustomerDto customerDto){
+   public HashMap<String,Object> createCustomer(CustomerDto customerDto){
         Customer customer =new Customer();
+        HashMap<String,Object> response = new HashMap<>();
+        HashMap<String,Object> response1= new HashMap<>();
         customer.setName(customerDto.getName());
         customer.setPhoneNo(customerDto.getPhoneNo());
         customer.setLocation((customerDto.getLocation()));
         customerRepository.save(customer);
-        return customer;
+        response1.put("message","Created Customer " +customerDto.getName() +" Successfully with id! "+customer.getId());
+        response.put("isSuccess",true);
+        response.put("message",response1);
+        return  response;
    }
 
-   public Customer getSingleCustomer(int id){
-        return  customerRepository.findById(id).orElse(null);
+   public HashMap<String,Object> getSingleCustomer(int id){
+       HashMap<String,Object> response = new HashMap<>();
+       HashMap<String,Object> response1= new HashMap<>();
+       var customer=  customerRepository.findById(id);
+       if(customer.isEmpty()){
+           response1.put("message","incorrect customer id "+id+", please enter the valid id!");
+           response.put("isSuccess",false);
+           response.put("message",response1);
+           return  response;
+       }
+       response.put("isSuccess",true);
+       response.put("message",customer);
+       return  response;
    }
 
    public HashMap<String,Object> updateCustomer(CustomerDto customerDto){
@@ -46,8 +62,9 @@ public class CustomerService {
            customer.setPhoneNo(customerDto.getPhoneNo());
            customer.setLocation(customerDto.getLocation());
            customerRepository.save(customer);
+           response1.put("message","Updated Customer " +customerDto.getName() +" Successfully with id! "+customerDto.getCustomerId());
            response.put("isSuccess",true);
-           response.put("message",customer);
+           response.put("message",response1);
            return  response;
        }
 

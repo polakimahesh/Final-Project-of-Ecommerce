@@ -18,5 +18,5 @@ public class ProductDto {
     private double price;
     @NotNull(message = "Description is mandatory")
     private String description;
-    private  double totalPrice;
+//    private  double totalPrice;
 }

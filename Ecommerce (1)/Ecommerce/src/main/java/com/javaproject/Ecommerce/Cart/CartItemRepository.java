@@ -11,4 +11,7 @@ import java.util.List;
 public interface CartItemRepository extends JpaRepository<CartItem,Integer> {
     List<CartItem> findByCart_Id(int id);
 
+    long deleteByCart_Id(int cartId);
+
+
 }

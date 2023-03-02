@@ -5,11 +5,14 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class OrderItemResponseDto {
-//    private int orderItemId;
+public class GetSingleItemDto {
+    private int customerId;
+    private int orderId;
+    private int orderItemId;
     private String itemName;
     private  int itemQuantity;
     private  double itemPrice;
     private String description;
     private double totalPrice;
+
 }

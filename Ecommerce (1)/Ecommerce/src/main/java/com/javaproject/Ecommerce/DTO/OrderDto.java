@@ -9,5 +9,6 @@ public class OrderDto {
 
     private String address;
     private int customerId;
+    private  double grandTotal;
 
 }
